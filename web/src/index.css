@@ -1,0 +1,22 @@
+:root { --green:#0F7B6C; --bg:#F7F9F9; --card:#fff; --text:#1A1C1E; --muted:#5A6472; }
+* { box-sizing: border-box; }
+body { margin:0; font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); color: var(--text); direction: rtl; }
+.page { max-width: 1100px; margin: 0 auto; padding: 24px; }
+.center { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 12px; min-height: 60vh; justify-content: center; }
+.top h1 { color: var(--green); margin: 0; }
+.filters { display: flex; gap: 12px; flex-wrap: wrap; margin: 16px 0; }
+.filters input, .filters select { padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+.card { background: var(--card); border-radius: 12px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+.avatar { width: 48px; height: 48px; border-radius: 50%; background: #E3F2EF; color: var(--green); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 20px; }
+.info h3 { margin: 8px 0 4px; }
+.info p { margin: 2px 0; color: var(--muted); font-size: 14px; }
+.rating { color: var(--text); }
+.badge { display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 12px; }
+.badge.ok { background: #E3F2EF; color: var(--green); }
+.badge.busy { background: #eee; color: var(--muted); }
+.actions { display: flex; gap: 8px; margin-top: 12px; }
+.btn { padding: 8px 14px; border-radius: 8px; text-decoration: none; font-weight: 600; text-align: center; }
+.btn.call { background: var(--green); color: #fff; }
+.btn.wa { background: #25D366; color: #fff; }
+.btn.google { background: #fff; border: 1px solid #ddd; color: var(--text); }

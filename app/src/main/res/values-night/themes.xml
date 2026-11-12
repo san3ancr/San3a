@@ -1,0 +1,7 @@
+<resources>
+    <style name="Theme.San3a" parent="android:Theme.Material.NoActionBar">
+        <item name="android:statusBarColor">@color/brand_green_dark</item>
+        <item name="android:windowBackground">#121212</item>
+        <item name="android:navigationBarColor">#121212</item>
+    </style>
+</resources>
