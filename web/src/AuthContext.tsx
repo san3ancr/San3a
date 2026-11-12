@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react';
-import { onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut as fbSignOut, type User } from 'firebase/auth';
+import { onAuthStateChanged, signInWithRedirect, getRedirectResult, GoogleAuthProvider, signOut as fbSignOut, type User } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { auth, db } from './firebase';
 import type { UserProfile } from './types';
@@ -30,6 +30,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   useEffect(() => {
+    (async () => {
+      try {
+        const result = await getRedirectResult(auth);
+        if (result?.user) {
+          const u = result.user;
+          const snap = await getDoc(doc(db, 'users', u.uid));
+          if (!snap.exists()) {
+            const newProfile: UserProfile = {
+              uid: u.uid,
+              name: u.displayName || '',
+              phone: u.phoneNumber || '',
+              whatsapp: '',
+              role: 'customer',
+              craft: '',
+              region: '',
+              available: true,
+              createdAt: Date.now(),
+              ratingSum: 0,
+              ratingCount: 0,
+              latitude: 0,
+              longitude: 0,
+            };
+            await setDoc(doc(db, 'users', u.uid), newProfile);
+            setProfile(newProfile);
+          }
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    })();
+
     const unsub = onAuthStateChanged(auth, async (u) => {
       setUser(u);
       if (u) await loadProfile(u);
@@ -41,30 +72,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   async function signInWithGoogle() {
     const provider = new GoogleAuthProvider();
-    const result = await signInWithPopup(auth, provider);
-    const u = result.user;
-    const snap = await getDoc(doc(db, 'users', u.uid));
-    if (!snap.exists()) {
-      const newProfile: UserProfile = {
-        uid: u.uid,
-        name: u.displayName || '',
-        phone: u.phoneNumber || '',
-        whatsapp: '',
-        role: 'customer',
-        craft: '',
-        region: '',
-        available: true,
-        createdAt: Date.now(),
-        ratingSum: 0,
-        ratingCount: 0,
-        latitude: 0,
-        longitude: 0,
-      };
-      await setDoc(doc(db, 'users', u.uid), newProfile);
-      setProfile(newProfile);
-    } else {
-      setProfile(snap.data() as UserProfile);
-    }
+    await signInWithRedirect(auth, provider);
   }
 
   async function signOut() {
