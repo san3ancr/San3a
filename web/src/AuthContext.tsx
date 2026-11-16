@@ -62,7 +62,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       } catch (e: any) {
         console.error(e);
-        setAuthError(e?.message || 'تعذّر تسجيل الدخول');
+        const msg = e?.message || 'تعذّر تسجيل الدخول';
+        setAuthError(msg);
+        try { window.alert(msg); } catch {}
       }
     })();
 
@@ -82,7 +84,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await signInWithRedirect(auth, provider);
     } catch (e: any) {
       console.error('signInWithGoogle error', e);
-      setAuthError(e?.message || 'تعذّر تسجيل الدخول');
+      const msg = e?.message || 'تعذّر تسجيل الدخول';
+      setAuthError(msg);
+      try { window.alert(msg); } catch {}
     }
   }
 
