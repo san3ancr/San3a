@@ -23,10 +23,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [authError, setAuthError] = useState<string | null>(null);
 
   async function loadProfile(u: User) {
-    const snap = await getDoc(doc(db, 'users', u.uid));
-    if (snap.exists()) {
-      setProfile(snap.data() as UserProfile);
-    } else {
+    try {
+      const snap = await getDoc(doc(db, 'users', u.uid));
+      if (snap.exists()) {
+        setProfile(snap.data() as UserProfile);
+      } else {
+        setProfile(null);
+      }
+    } catch (e: any) {
+      console.error('loadProfile error', e);
+      // Do not block auth; allow setup flow
       setProfile(null);
     }
   }
@@ -47,8 +53,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
       const u = result.user;
-      const snap = await getDoc(doc(db, 'users', u.uid));
-      if (!snap.exists()) {
+      let snap;
+      try {
+        snap = await getDoc(doc(db, 'users', u.uid));
+      } catch (e) {
+        console.error('getDoc error', e);
+        snap = null;
+      }
+      if (!snap || !snap.exists()) {
         const newProfile: UserProfile = {
           uid: u.uid,
           name: u.displayName || '',
