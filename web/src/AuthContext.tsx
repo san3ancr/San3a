@@ -8,6 +8,7 @@ interface AuthContextValue {
   user: User | null;
   profile: UserProfile | null;
   loading: boolean;
+  authError: string | null;
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
@@ -19,6 +20,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [authError, setAuthError] = useState<string | null>(null);
 
   async function loadProfile(u: User) {
     const snap = await getDoc(doc(db, 'users', u.uid));
@@ -56,8 +58,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setProfile(newProfile);
           }
         }
-      } catch (e) {
+      } catch (e: any) {
         console.error(e);
+        setAuthError(e?.message || 'تعذّر تسجيل الدخول');
       }
     })();
 
@@ -71,8 +74,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   async function signInWithGoogle() {
-    const provider = new GoogleAuthProvider();
-    await signInWithRedirect(auth, provider);
+    setAuthError(null);
+    try {
+      const provider = new GoogleAuthProvider();
+      await signInWithRedirect(auth, provider);
+    } catch (e: any) {
+      console.error('signInWithGoogle error', e);
+      setAuthError(e?.message || 'تعذّر تسجيل الدخول');
+    }
   }
 
   async function signOut() {
@@ -85,7 +94,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, profile, loading, signInWithGoogle, signOut, refreshProfile }}>
+    <AuthContext.Provider value={{ user, profile, loading, authError, signInWithGoogle, signOut, refreshProfile }}>
       {children}
     </AuthContext.Provider>
   );

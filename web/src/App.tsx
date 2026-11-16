@@ -14,12 +14,13 @@ function Protected({ children }: { children: React.ReactNode }) {
 }
 
 function Login() {
-  const { signInWithGoogle } = useAuth();
+  const { signInWithGoogle, authError } = useAuth();
   return (
     <div className="page center">
       <h1>صنعة</h1>
       <p>سجّل الدخول للمتابعة</p>
       <button className="btn google" onClick={() => signInWithGoogle()}>المتابعة بحساب Google</button>
+      {authError && <p style={{ color: 'red' }}>{authError}</p>}
     </div>
   );
 }
