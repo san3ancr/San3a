@@ -4,7 +4,7 @@ import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY || 'AIzaSyB_C9a6kecrPSiK26j4eomNtTSk-43iuvo',
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || 'san3a-98fdb.firebaseapp.com',
+  authDomain: 'san3a-98fdb.firebaseapp.com',
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || 'san3a-98fdb',
   storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || 'san3a-98fdb.firebasestorage.app',
   messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '673930513703',
