@@ -34,7 +34,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     (async () => {
       try {
+        console.log('getRedirectResult start');
         const result = await getRedirectResult(auth);
+        console.log('getRedirectResult result', result?.user?.uid);
         if (result?.user) {
           const u = result.user;
           const snap = await getDoc(doc(db, 'users', u.uid));
