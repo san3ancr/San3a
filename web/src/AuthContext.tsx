@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react';
-import { onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut as fbSignOut, type User } from 'firebase/auth';
+import { onAuthStateChanged, signInWithRedirect, getRedirectResult, GoogleAuthProvider, signOut as fbSignOut, type User } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { auth, db } from './firebase';
 import type { UserProfile } from './types';
@@ -25,19 +25,51 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   async function loadProfile(u: User) {
     try {
       const snap = await getDoc(doc(db, 'users', u.uid));
-      if (snap.exists()) {
-        setProfile(snap.data() as UserProfile);
-      } else {
-        setProfile(null);
-      }
+      if (snap.exists()) setProfile(snap.data() as UserProfile);
+      else setProfile(null);
     } catch (e: any) {
       console.error('loadProfile error', e);
-      // Do not block auth; allow setup flow
       setProfile(null);
     }
   }
 
   useEffect(() => {
+    (async () => {
+      try {
+        const result = await getRedirectResult(auth);
+        if (result?.user) {
+          const u = result.user;
+          const snap = await getDoc(doc(db, 'users', u.uid));
+          if (!snap.exists()) {
+            const newProfile: UserProfile = {
+              uid: u.uid,
+              name: u.displayName || '',
+              phone: u.phoneNumber || '',
+              whatsapp: '',
+              role: 'customer',
+              craft: '',
+              region: '',
+              available: true,
+              createdAt: Date.now(),
+              ratingSum: 0,
+              ratingCount: 0,
+              latitude: 0,
+              longitude: 0,
+            };
+            await setDoc(doc(db, 'users', u.uid), newProfile);
+            setProfile(newProfile);
+          } else {
+            setProfile(snap.data() as UserProfile);
+          }
+        }
+      } catch (e: any) {
+        console.error('getRedirectResult error', e);
+        const msg = e?.message || 'تعذّر تسجيل الدخول';
+        setAuthError(msg);
+        try { window.alert(msg); } catch {}
+      }
+    })();
+
     const unsub = onAuthStateChanged(auth, async (u) => {
       setUser(u);
       if (u) await loadProfile(u);
@@ -51,36 +83,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setAuthError(null);
     try {
       const provider = new GoogleAuthProvider();
-      const result = await signInWithPopup(auth, provider);
-      const u = result.user;
-      let snap;
-      try {
-        snap = await getDoc(doc(db, 'users', u.uid));
-      } catch (e) {
-        console.error('getDoc error', e);
-        snap = null;
-      }
-      if (!snap || !snap.exists()) {
-        const newProfile: UserProfile = {
-          uid: u.uid,
-          name: u.displayName || '',
-          phone: u.phoneNumber || '',
-          whatsapp: '',
-          role: 'customer',
-          craft: '',
-          region: '',
-          available: true,
-          createdAt: Date.now(),
-          ratingSum: 0,
-          ratingCount: 0,
-          latitude: 0,
-          longitude: 0,
-        };
-        await setDoc(doc(db, 'users', u.uid), newProfile);
-        setProfile(newProfile);
-      } else {
-        setProfile(snap.data() as UserProfile);
-      }
+      await signInWithRedirect(auth, provider);
     } catch (e: any) {
       console.error('signInWithGoogle error', e);
       const msg = e?.message || 'تعذّر تسجيل الدخول';
