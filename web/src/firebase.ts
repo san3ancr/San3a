@@ -3,7 +3,7 @@ import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || 'AIzaSyBu-LPoVV8I_wcC3GYMqXWfV2w8jL73QB4',
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || 'AIzaSyB_C9a6kecrPSiK26j4eomNtTSk-43iuvo',
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || 'san3a-98fdb.firebaseapp.com',
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || 'san3a-98fdb',
   storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || 'san3a-98fdb.firebasestorage.app',
